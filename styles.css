@@ -1,0 +1,26 @@
+/* שפת המותג "הורים לעתיד" — טוקנים משותפים */
+:root{
+  --cream:#FAF4EA; --paper:#FFFDF8; --ink:#1B2B3A; --sea:#1F6F78; --terra:#D9593D;
+  --saffron:#F2B441; --sage:#CFE0D2; --muted:#56636F; --line:#E8DFCF;
+  --font:"Assistant","Segoe UI",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--font);background:var(--cream);color:var(--ink);line-height:1.75;font-size:17px}
+h1,h2,h3{font-family:var(--font);line-height:1.2;margin:0}
+a{color:var(--sea)}
+.wrap{max-width:1000px;margin:0 auto;padding:0 20px}
+
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--terra);color:#fff;text-decoration:none;
+  font:inherit;font-weight:700;padding:12px 26px;border-radius:99px;border:0;cursor:pointer;transition:transform .15s}
+.btn:hover{transform:translateY(-2px)}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--ink)}
+.btn.small{padding:6px 14px;font-size:14px}
+
+.kicker{color:var(--terra);font-weight:700;font-size:14px;margin-bottom:6px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:24px}
+.pill{display:inline-block;font-weight:700;font-size:13px;padding:3px 12px;border-radius:99px;background:var(--sage);color:var(--sea)}
+
+table{width:100%;border-collapse:collapse}
+th,td{text-align:right;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:14px;color:var(--muted)}

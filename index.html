@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ללמוד ולחשוב עם AI | הורים לעתיד</title>
+<meta name="description" content="ארגז כלים להורים: איך משתמשים ב-AI כדי ללמוד ולא רק כדי לסיים את העבודה.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<style>
+  nav{position:sticky;top:0;z-index:10;background:#FAF4EAEE;backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;gap:20px;height:58px;overflow-x:auto}
+  .logo{font-weight:800;font-size:19px;margin-inline-end:auto;white-space:nowrap;text-decoration:none;color:var(--ink)}
+  .logo i{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--terra);margin-inline-start:7px}
+  nav a:not(.logo){text-decoration:none;font-size:15px;white-space:nowrap;color:var(--muted)}
+  nav a:not(.logo):hover{color:var(--terra)}
+
+  .hero{padding:70px 0 56px;position:relative;overflow:hidden}
+  .hero::before{content:"";position:absolute;inset-inline-start:-110px;top:-90px;width:360px;height:360px;border-radius:50%;background:var(--saffron);opacity:.35}
+  .hero .wrap{position:relative}
+  h1{font-size:clamp(36px,6.5vw,64px);font-weight:800;margin:16px 0 14px;max-width:780px}
+  h1 em{font-style:normal;color:var(--terra)}
+  .lead{font-size:clamp(17px,2.2vw,21px);color:var(--muted);max-width:640px}
+
+  section{padding:60px 0}
+  .alt{background:var(--paper);border-block:1px solid var(--line)}
+  .dark{background:var(--ink);color:#F4EEE2}
+  .dark .kicker{color:var(--saffron)}
+  h2{font-size:clamp(28px,4vw,40px);font-weight:800;margin-bottom:10px}
+  .sub{color:var(--muted);max-width:660px}
+  .dark .sub{color:#C9D2D8}
+
+  .goals{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin-top:26px}
+  .goals .card{display:flex;gap:12px;align-items:flex-start}
+  .num{flex:none;display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:var(--sage);color:var(--sea);font-weight:800}
+
+  .compass{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:26px}
+  .compass div{border-radius:20px;padding:24px;background:#ffffff10;border:1px solid #ffffff26}
+  .compass b{display:block;color:var(--saffron);font-size:14px;margin-bottom:6px}
+  .compass p{margin:0;font-size:20px;font-weight:700}
+  @media(max-width:700px){.compass{grid-template-columns:1fr}}
+
+  .tool{margin-top:34px}
+  .tool h3{font-size:24px;font-weight:800;margin-bottom:6px}
+  .tool .tag{font-size:13px;font-weight:700;color:var(--sea)}
+  ol.big{counter-reset:q;list-style:none;padding:0;margin:16px 0 0;display:grid;gap:10px}
+  ol.big li{counter-increment:q;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:14px 18px;font-weight:600;display:flex;gap:12px;align-items:center}
+  ol.big li::before{content:counter(q);flex:none;display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--terra);color:#fff;font-weight:800}
+  .rule{margin-top:16px;background:var(--saffron);border-radius:16px;padding:16px 20px;font-weight:700}
+  .rule span{font-weight:500;display:block}
+
+  .prompts{display:grid;gap:10px;margin-top:16px}
+  .prompt{display:flex;gap:12px;align-items:center;justify-content:space-between;background:var(--paper);border:1px solid var(--line);border-inline-start:5px solid var(--sea);border-radius:14px;padding:12px 16px}
+  .prompt p{margin:0}
+  .bad{border-inline-start-color:var(--terra);background:#FBEAE4}
+  .bad p{text-decoration:line-through;color:var(--muted)}
+  .copy{flex:none;background:var(--ink);color:#fff;border:0;border-radius:99px;font:inherit;font-size:13px;font-weight:700;padding:6px 14px;cursor:pointer}
+  .copy.done{background:var(--sea)}
+
+  .ex-tabs{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+  .ex-tabs button{font:inherit;font-weight:700;border:2px solid var(--ink);background:transparent;color:var(--ink);border-radius:99px;padding:8px 18px;cursor:pointer}
+  .ex-tabs button[aria-selected="true"]{background:var(--ink);color:#fff}
+  .case{margin-top:18px}
+  .case .who{font-size:13px;font-weight:700;color:var(--terra)}
+  .case h3{font-size:21px;margin:4px 0 6px}
+  .case .ask{background:var(--cream);border-radius:12px;padding:10px 14px;margin:10px 0 0}
+  .fields{display:grid;gap:12px;margin-top:18px}
+  .fields label{font-weight:700;font-size:15px}
+  textarea{font:inherit;width:100%;padding:10px 14px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);resize:vertical}
+  textarea:focus{outline:2px solid var(--sea);border-color:transparent}
+  .direction{display:none;margin-top:14px;background:var(--sage);border-radius:16px;padding:16px 20px}
+  .direction.show{display:block}
+  .note{font-size:13px;color:var(--muted);margin-top:8px}
+
+  .exit{display:grid;gap:10px;margin-top:18px}
+  .exit label{display:flex;gap:12px;align-items:center;background:var(--paper);border:1.5px solid var(--line);border-radius:14px;padding:14px 18px;cursor:pointer;font-weight:600}
+  .exit input{accent-color:var(--terra);width:20px;height:20px}
+  .exit label:has(input:checked){border-color:var(--terra);background:#FDF0EB}
+
+  .closing{font-size:clamp(22px,3.2vw,30px);font-weight:700;max-width:760px}
+  .closing span{color:var(--terra)}
+  footer{background:var(--ink);color:#C9D2D8;padding:28px 0;font-size:14px}
+  footer .wrap{display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between}
+  footer a{color:var(--saffron)}
+  .tbl{overflow-x:auto;margin-top:16px;background:var(--paper);border:1px solid var(--line);border-radius:16px}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a class="logo" href="#top">ללמוד ולחשוב עם AI<i></i></a>
+  <a href="#compass">המצפן</a>
+  <a href="#tools">ארגז הכלים</a>
+  <a href="#exercise">התרגיל</a>
+  <a href="#exit">משימת יציאה</a>
+  <a href="worksheet.html">דף עבודה</a>
+</div></nav>
+
+<header class="hero" id="top"><div class="wrap">
+  <span class="pill">הורים לעתיד · מפגש של 90 דקות</span>
+  <h1>מה הילד <em>למד</em> בזמן שהכין את העבודה?</h1>
+  <p class="lead">שאלה אחת שאפשר לקחת הביתה. בעמוד הזה תמצאו את השאלות שאפשר לשאול בבית, ואת הדרכים להשתמש ב-AI כדי להבין, לנסות ולבדוק.</p>
+  <div class="goals">
+    <div class="card"><span class="num">1</span><div>לזהות איזו יכולת הילד אמור לפתח במשימה מסוימת.</div></div>
+    <div class="card"><span class="num">2</span><div>לבחור תפקיד מועיל ל-AI באותה משימה.</div></div>
+    <div class="card"><span class="num">3</span><div>לשאול את הילד שאלות שמגלות מה הבין ומה הוא מסוגל לעשות בעצמו.</div></div>
+    <div class="card"><span class="num">4</span><div>להתאים את אופן השימוש לגיל ולשלב הלמידה.</div></div>
+  </div>
+</div></header>
+
+<section id="compass" class="dark"><div class="wrap">
+  <div class="kicker">המצפן הביתי</div>
+  <h2>לפני, תוך כדי, אחרי</h2>
+  <div class="compass">
+    <div><b>לפני</b><p>מה הילד צריך ללמוד?</p></div>
+    <div><b>תוך כדי</b><p>במה AI עוזר לו, ומה הוא עושה בעצמו?</p></div>
+    <div><b>אחרי</b><p>האם הוא מסוגל להסביר, לבדוק ולהמשיך?</p></div>
+  </div>
+</div></section>
+
+<section id="tools"><div class="wrap">
+  <div class="kicker">ארגז הכלים ההורי</div>
+  <h2>כלים שאפשר להפעיל כבר הערב</h2>
+
+  <div class="tool">
+    <span class="tag">כלי 1</span>
+    <h3>שלוש שאלות לפני שפונים ל-AI</h3>
+    <ol class="big">
+      <li>מה הילד אמור ללמוד מהמשימה?</li>
+      <li>איזה חלק חשוב שיעשה בעצמו?</li>
+      <li>איפה AI יכול לעזור לו להתקדם?</li>
+    </ol>
+    <div class="rule">קודם אני, אחר כך AI
+      <span>לפני פתיחת הכלי הילד כותב מה הוא כבר יודע, מה הוא חושב ומה אינו מבין. גם דקה של חשיבה עצמאית נותנת לו נקודת מוצא משלו.</span></div>
+  </div>
+
+  <div class="tool">
+    <span class="tag">כלי 2</span>
+    <h3>לבקש מ-AI ללמד</h3>
+    <p class="sub">הבקשה שאנחנו כותבים לכלי קובעת במידה רבה את התפקיד שלו: לתת תשובה, או לשאול, לתת רמז, להציע תרגול ולהגיב לניסיון של הילד.</p>
+    <div class="prompts">
+      <div class="prompt bad"><p>״פתור לי את התרגיל.״</p></div>
+      <div class="prompt"><p>״שאל אותי שאלה אחת בכל פעם כדי לעזור לי להגיע לפתרון.״</p><button class="copy">העתקה</button></div>
+      <div class="prompt"><p>״תן לי רמז אחד בלבד.״</p><button class="copy">העתקה</button></div>
+      <div class="prompt"><p>״אנסה לפתור בעצמי. בדוק את הדרך שלי והראה לי איפה כדאי לבדוק שוב.״</p><button class="copy">העתקה</button></div>
+      <div class="prompt"><p>״בחן אותי על החומר. חכה לתשובה שלי לפני שאתה ממשיך.״</p><button class="copy">העתקה</button></div>
+    </div>
+  </div>
+
+  <div class="tool">
+    <span class="tag">כלי 4</span>
+    <h3>מבחן הבעלות: שאלות אחרי שימוש ב-AI</h3>
+    <ol class="big">
+      <li>תסביר לי את זה במילים שלך.</li>
+      <li>למה בחרת דווקא בדרך הזאת?</li>
+      <li>מה יכול להיות כאן לא נכון?</li>
+      <li>מה תעשה אם נשנה מעט את השאלה?</li>
+      <li>מה למדת שלא ידעת קודם?</li>
+    </ol>
+    <p class="sub" style="margin-top:12px">זו לא בחינה שההורה עושה לילד בסוף כל עבודה. אלה שאלות שעוזרות לנו להתעניין בדרך שלו. אם קשה לו לענות, גילינו יחד לאן כדאי לחזור.</p>
+  </div>
+
+  <div class="tool">
+    <span class="tag">כלי 5</span>
+    <h3>לנסות בעצמכם: שיחה מלמדת עם AI</h3>
+    <p class="sub">העתיקו לכלי שיחה ונסו לענות. כדאי לענות פעם אחת תשובה חלקית ולראות איך מבקשים רמז ומנסים שוב.</p>
+    <div class="prompts">
+      <div class="prompt"><p>״אני תלמיד בכיתה ו׳ שלומד על מחזור המים. אני רוצה להבין את התהליך ולהתכונן לשאלה בכיתה. שאל אותי שאלה אחת בכל פעם. אם טעיתי, תן לי רמז קצר ואפשר לי לנסות שוב. אחרי שלוש שאלות, בקש ממני להסביר את כל התהליך במילים שלי.״</p><button class="copy">העתקה</button></div>
+    </div>
+  </div>
+
+  <div class="tool">
+    <span class="tag">כלי 6</span>
+    <h3>התאמה לגיל ולבית שלכם</h3>
+    <div class="tbl"><table>
+      <tr><th>גיל</th><th>הדגש להורה</th></tr>
+      <tr><td><b>יסודי</b></td><td>שימוש משותף, בניית יסודות, ״קודם אתה״ ועזרה בהסבר ובתרגול</td></tr>
+      <tr><td><b>חטיבה</b></td><td>יותר עצמאות, לצד בדיקה, השוואה והסבר של התשובות</td></tr>
+      <tr><td><b>תיכון</b></td><td>אחריות על דרך העבודה, בדיקת מקורות ויכולת לנמק החלטות</td></tr>
+    </table></div>
+    <p class="sub" style="margin-top:12px">כשמדובר במשימה מבית הספר, כדאי לבדוק גם את הנחיות המורה והשימוש בכלים המאושרים לתלמידים. <a href="https://pop.education.gov.il/sherutey-tiksuv-bachinuch/international-digital-ai-tools/" target="_blank" rel="noopener">הנחיות משרד החינוך</a> מבחינות בין שכבות גיל ובין סוגי כלים, וכוללות גם התייחסות לאישור הורים.</p>
+  </div>
+</div></section>
+
+<section id="exercise" class="alt"><div class="wrap">
+  <div class="kicker">כלי 3 · התרגיל</div>
+  <h2>שלוש משימות, שלושה גילאים</h2>
+  <p class="sub">בחרו מקרה אחד וענו על ארבע השאלות. אחר כך פתחו כיוון אפשרי לדיון.</p>
+  <div class="ex-tabs" role="tablist">
+    <button role="tab" data-case="a" aria-selected="true">מקרה א׳ · יסודי</button>
+    <button role="tab" data-case="b" aria-selected="false">מקרה ב׳ · חטיבה</button>
+    <button role="tab" data-case="c" aria-selected="false">מקרה ג׳ · תיכון</button>
+  </div>
+  <div class="card case">
+    <div class="who" id="caseWho"></div>
+    <h3 id="caseTitle"></h3>
+    <p class="ask" id="caseAsk"></p>
+    <div class="fields">
+      <label>1. מה הילד אמור ללמוד?<textarea rows="2" data-f="0"></textarea></label>
+      <label>2. מה הוא יעשה בעצמו?<textarea rows="2" data-f="1"></textarea></label>
+      <label>3. איזו עזרה יבקש מ-AI?<textarea rows="2" data-f="2"></textarea></label>
+      <label>4. איך נדע בסוף מה למד?<textarea rows="2" data-f="3"></textarea></label>
+    </div>
+    <p style="margin-top:14px"><button class="btn small" id="showDir">הצג כיוון אפשרי</button></p>
+    <div class="direction" id="caseDir"></div>
+    <p class="note">התשובות נשמרות רק בדפדפן שלכם.</p>
+  </div>
+  <p class="sub" style="margin-top:18px">אותו שימוש ב-AI יכול להיות מועיל מאוד במשימה אחת ולפספס את מטרת הלמידה במשימה אחרת. קודם מזהים מה הילד לומד, ואז מחליטים מה לבקש מהכלי.</p>
+</div></section>
+
+<section><div class="wrap">
+  <div class="kicker">למה זה חשוב</div>
+  <h2>שני תלמידים, אותו תוצר</h2>
+  <div class="goals">
+    <div class="card">תלמיד אחד נעזר ב-AI כדי להבין, לבדוק רעיונות ולשפר עבודה שכתב.</div>
+    <div class="card">תלמיד שני קיבל ממנו תשובות והגיש תוצר טוב.</div>
+  </div>
+  <p class="sub" style="margin-top:16px">שניהם עשויים לקבל ציון מצוין. השאלה היא מה יקרה כשנבקש מהם להסביר את העבודה, לפתור בעיה דומה או להמשיך ממנה. בסקירת <a href="https://www.oecd.org/en/publications/oecd-digital-education-outlook-2026_062a7394-en.html" target="_blank" rel="noopener">OECD מ-2026</a> נמצא שכלי AI יכולים לשפר את איכות הביצוע במשימה גם כשלא חל שיפור מקביל בלמידה, ושימוש שמכוון במפורש ללמידה עשוי לתמוך ברכישת ידע ומיומנויות.</p>
+</div></section>
+
+<section id="exit" class="alt"><div class="wrap">
+  <div class="kicker">משימת יציאה</div>
+  <h2>משפט אחד לשבוע הקרוב</h2>
+  <p class="sub">בחרו משפט אחד שתנסו בבית.</p>
+  <div class="exit">
+    <label><input type="radio" name="exit" value="0">״מה אתה אמור ללמוד מהמשימה הזאת?״</label>
+    <label><input type="radio" name="exit" value="1">״בוא נבקש רמז אחד וננסה להמשיך.״</label>
+    <label><input type="radio" name="exit" value="2">״תסביר לי למה בחרת בדרך הזאת.״</label>
+  </div>
+  <p style="margin-top:22px"><a class="btn" href="worksheet.html">לדף העבודה להדפסה</a></p>
+</div></section>
+
+<section><div class="wrap">
+  <p class="closing">״אני רוצה שהילדים שלנו ידעו לעשות יותר בעזרת AI. ושכשישאלו אותם על מה שעשו, הם יוכלו לומר בגאווה: <span>אני מבין את זה, אני בחרתי, ואני יודע גם איך להמשיך מכאן.</span>״</p>
+</div></section>
+
+<footer><div class="wrap">
+  <span>השאלה היא מה הילד למד בדרך, ולא רק מה יצא בסוף.</span>
+  <span><a href="worksheet.html">דף עבודה</a> · <a href="slides.html">מצגת</a></span>
+</div></footer>
+
+<script>
+  const store = {
+    get(k){ try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+    set(k,v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+  };
+
+  document.querySelectorAll(".copy").forEach(b => b.addEventListener("click", async () => {
+    const text = b.previousElementSibling.textContent.replace(/^״|״$/g, "");
+    try { await navigator.clipboard.writeText(text); } catch {
+      const t = document.createElement("textarea"); t.value = text; document.body.append(t); t.select(); document.execCommand("copy"); t.remove();
+    }
+    b.textContent = "הועתק ✓"; b.classList.add("done");
+    setTimeout(() => { b.textContent = "העתקה"; b.classList.remove("done"); }, 1600);
+  }));
+
+  const cases = {
+    a: { who:"מקרה א׳ · יסודי",
+         title:"ילדה בכיתה ה׳ צריכה לכתוב סיפור קצר ובו דמות שעוברת שינוי.",
+         ask:"היא מבקשת מ-AI: ״כתוב לי סיפור מקורי של עמוד״.",
+         dir:"הילדה בוחרת את הדמות וכותבת. AI יכול לשאול אותה שאלות על הרצון של הדמות, הקושי שלה ומה השתנה בסוף." },
+    b: { who:"מקרה ב׳ · חטיבה",
+         title:"תלמיד בכיתה ח׳ נתקע בתרגיל במתמטיקה.",
+         ask:"הוא מבקש מ-AI את הפתרון המלא.",
+         dir:"התלמיד מסמן באיזה שלב נתקע ומבקש רמז אחד. אחר כך הוא מנסה להמשיך ומבקש בדיקה של הדרך." },
+    c: { who:"מקרה ג׳ · תיכון",
+         title:"תלמידה מכינה עבודה על אנרגיה מתחדשת.",
+         ask:"AI הציע לה ראשי פרקים, טענות וכמה מקורות.",
+         dir:"היא בוחרת שאלת מחקר, בודקת את המקורות עצמם, מחליטה אילו טענות מבוססות ובונה את הטיעון שלה." }
+  };
+  const fields = [...document.querySelectorAll("[data-f]")];
+  const dir = document.getElementById("caseDir");
+  let current = "a";
+  const answers = store.get("lwai-answers") || {};
+
+  function showCase(id){
+    current = id;
+    const c = cases[id];
+    caseWho.textContent = c.who; caseTitle.textContent = c.title; caseAsk.textContent = c.ask;
+    dir.innerHTML = "<b>כיוון אפשרי לדיון:</b> " + c.dir; dir.classList.remove("show");
+    showDir.textContent = "הצג כיוון אפשרי";
+    fields.forEach((f,i) => f.value = (answers[id] || [])[i] || "");
+    document.querySelectorAll("[data-case]").forEach(b => b.setAttribute("aria-selected", b.dataset.case === id));
+  }
+  document.querySelectorAll("[data-case]").forEach(b => b.addEventListener("click", () => showCase(b.dataset.case)));
+  fields.forEach((f,i) => f.addEventListener("input", () => {
+    (answers[current] ||= [])[i] = f.value; store.set("lwai-answers", answers);
+  }));
+  showDir.addEventListener("click", () => {
+    const on = dir.classList.toggle("show");
+    showDir.textContent = on ? "הסתר כיוון" : "הצג כיוון אפשרי";
+  });
+  showCase("a");
+
+  const exitSaved = store.get("lwai-exit");
+  if (exitSaved !== null) { const r = document.querySelector(`input[name=exit][value="${exitSaved}"]`); if (r) r.checked = true; }
+  document.querySelectorAll("input[name=exit]").forEach(r => r.addEventListener("change", () => store.set("lwai-exit", r.value)));
+</script>
+</body>
+</html>

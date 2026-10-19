@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>מצגת | ללמוד ולחשוב עם AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  html,body{height:100%;overflow:hidden}
+  body{font-size:clamp(16px,1.6vw,26px)}
+  .slide{position:absolute;inset:0 0 6px;display:none;flex-direction:column;justify-content:center;padding:4vh 7vw 8vh;overflow:auto}
+  .slide.on{display:flex}
+  .slide.dark{background:var(--ink);color:#F4EEE2}
+  .slide.dark .kicker{color:var(--saffron)}
+  .kicker{font-size:.75em}
+  h1{font-size:clamp(34px,5.4vw,92px);font-weight:800}
+  h2{font-size:clamp(28px,3.8vw,64px);font-weight:800;margin-bottom:.5em}
+  em{font-style:normal;color:var(--terra)}
+  .dark em{color:var(--saffron)}
+  .big{font-size:1.35em;line-height:1.5}
+  .q{font-size:clamp(30px,4vw,68px);font-weight:800;margin-top:.5em}
+
+  .poll{display:flex;gap:2vw;margin-top:4vh;flex-wrap:wrap}
+  .poll div{flex:1;min-width:140px;text-align:center;font-size:1.8em;font-weight:800;padding:3vh 0;border-radius:24px;background:var(--paper);border:2px solid var(--line)}
+  .poll div:nth-child(3){background:var(--saffron);border-color:var(--saffron)}
+
+  .chain{display:flex;flex-wrap:wrap;gap:1vw;align-items:center;margin-top:4vh;font-size:1.5em;font-weight:800}
+  .chain span{background:var(--paper);border:2px solid var(--line);border-radius:99px;padding:.4em 1em}
+  .chain i{font-style:normal;color:var(--terra)}
+
+  .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:2vw;margin-top:3vh}
+  .box{background:var(--paper);border:1px solid var(--line);border-radius:24px;padding:1.2em 1.4em}
+  .dark .box{background:#ffffff10;border-color:#ffffff26}
+  .box b{display:block;font-size:1.2em;margin-bottom:.3em;color:var(--terra)}
+  .dark .box b{color:var(--saffron)}
+  .box p{margin:0}
+
+  ol.list{list-style:none;counter-reset:n;padding:0;margin:3vh 0 0;display:grid;gap:1.6vh;font-size:1.3em;font-weight:700}
+  ol.list li{counter-increment:n;display:flex;gap:.7em;align-items:center}
+  ol.list li::before{content:counter(n);flex:none;display:grid;place-items:center;width:1.8em;height:1.8em;border-radius:50%;background:var(--terra);color:#fff}
+  .strike{font-size:1.4em;text-decoration:line-through;color:var(--muted);margin-bottom:1em}
+  .prompt-big{background:var(--paper);color:var(--ink);border-inline-start:8px solid var(--sea);border-radius:20px;padding:1em 1.3em;font-size:1.2em;font-weight:600;line-height:1.6;margin-top:2vh}
+  .timer-box{display:flex;gap:1em;align-items:center;flex-wrap:wrap;margin-top:3vh}
+  .timer-box .t{font-size:2.4em;font-weight:800;font-variant-numeric:tabular-nums;color:var(--saffron);min-width:4ch}
+  .timer-box button{font:inherit;font-size:.7em;font-weight:700;border:2px solid currentColor;background:transparent;color:inherit;border-radius:99px;padding:.4em 1em;cursor:pointer}
+  .timer-box button.on{background:var(--saffron);color:var(--ink);border-color:var(--saffron)}
+  table{font-size:1.1em}
+  .dark th,.dark td{border-color:#ffffff26}
+  .dark th{color:#C9D2D8}
+  .qr{position:absolute;inset-inline-end:7vw;bottom:9vh;text-align:center;font-size:.6em;font-weight:700;color:var(--muted)}
+  .qr div{background:#fff;padding:10px;border-radius:14px;margin-bottom:6px}
+  .qr img,.qr canvas{display:block;width:clamp(100px,12vw,190px)!important;height:auto!important}
+  .closing{font-size:clamp(24px,2.6vw,44px);font-weight:700;max-width:24em;margin-top:3vh}
+
+  /* notes & chrome */
+  .notes{display:none}
+  #notes{position:fixed;inset-inline:0;bottom:6px;max-height:38vh;overflow:auto;background:#1B2B3AF2;color:#F4EEE2;padding:16px 7vw;font-size:17px;line-height:1.6;display:none;z-index:20;border-top:3px solid var(--saffron)}
+  #notes.show{display:block}
+  #notes .when{color:var(--saffron);font-weight:800;margin-bottom:6px}
+  #notes blockquote{margin:8px 0;padding-inline-start:12px;border-inline-start:3px solid var(--terra)}
+  #progress{position:fixed;bottom:0;inset-inline-start:0;height:6px;background:var(--terra);transition:width .25s;z-index:30}
+  #hud{position:fixed;top:12px;inset-inline-start:16px;font-size:14px;font-weight:700;color:var(--muted);z-index:25;display:flex;gap:12px;align-items:center}
+  .dark-on #hud{color:#C9D2D8}
+  #clock.late{color:var(--terra)}
+  #help{position:fixed;top:12px;inset-inline-end:16px;font-size:13px;color:var(--muted);z-index:25;opacity:.7}
+  .navbtn{position:fixed;bottom:18px;z-index:25;font:inherit;font-weight:800;font-size:20px;width:44px;height:44px;border-radius:50%;border:0;background:#1B2B3A22;color:inherit;cursor:pointer}
+  #prev{inset-inline-start:16px} #next{inset-inline-start:68px}
+</style>
+</head>
+<body>
+
+<!-- 1 -->
+<section class="slide" data-time="09:30–09:37" data-mins="7" data-start="0">
+  <div class="kicker">ללמוד ולחשוב עם AI · הורים לעתיד</div>
+  <p class="big">ילד מגיש עבודה מצוינת.<br>הוא השתמש ב-AI כדי לבחור נושא, למצוא מידע, לבנות ראשי פרקים, לנסח ולערוך.</p>
+  <p class="q">האם הוא <em>עשה</em> את העבודה?</p>
+  <div class="qr"><div class="qrcode"></div>עמוד ההורים</div>
+  <aside class="notes">
+    <p>פתיחה: "אבל הוא עשה את זה לבד?"</p>
+  </aside>
+</section>
+
+<!-- 2 -->
+<section class="slide" data-time="09:30–09:37" data-mins="7" data-start="0">
+  <h2>האם הוא עשה את העבודה?</h2>
+  <div class="poll"><div>כן</div><div>לא</div><div>תלוי</div></div>
+  <aside class="notes">
+    <p>הצבעה בהרמת ידיים. אחר כך 2–3 הורים מסבירים במשפט אחד למה בחרו.</p>
+    <blockquote>״אני מנחשת שחלקכם חושבים: ברור שהוא עשה את העבודה, הוא הרי ניהל את כל התהליך. ואחרים חושבים: רגע, אבל מה הוא באמת עשה?<br>בעיניי, התשובה המעניינת היא ‘תלוי’. כדי להבין מה קרה כאן צריך לדעת מה הילד בחר, מה הוא הבין, איפה הוא התאמץ ומה הוא מסוגל לעשות עכשיו בעצמו.״</blockquote>
+    <p><b>מעבר:</b> ״זו השאלה שנלווה איתה את כל המפגש. בסוף גם תהיה לנו דרך פשוטה לענות עליה בבית, בלי להפוך כל שיעורי בית לחקירה.״</p>
+  </aside>
+</section>
+
+<!-- 3 -->
+<section class="slide" data-time="09:37–09:47" data-mins="10" data-start="7">
+  <div class="kicker">מה באמת השתנה בלמידה?</div>
+  <h2>שרשרת העבודה</h2>
+  <div class="chain"><span>לחפש</span><i>←</i><span>לקרוא</span><i>←</i><span>לבחור</span><i>←</i><span>להבין</span><i>←</i><span>לנסח</span><i>←</i><span>לערוך</span></div>
+  <p class="big" style="margin-top:5vh">באיזה שלב הילד שלכם פונה בדרך כלל ל-AI?</p>
+  <aside class="notes">
+    <blockquote>״כשהילד היה צריך להכין עבודה, כמעט כל השלבים האלה עברו דרכו. היום הוא יכול לקבל עזרה בכל אחד מהם, ולפעמים לקבל את התוצר כולו בבת אחת.<br>חלק מהשלבים האלה הם עבודה שאפשר לשמוח על כך שהתקצרה. חלקם הם בדיוק המקום שבו הילד לומד. לכן השאלה הראשונה שלי היא: <b>איזה חלק במשימה נועד לאמן אותו?</b>״</blockquote>
+    <p><b>דוגמה 1, כתיבת סיפור בכיתה ה׳:</b> אם המשימה נועדה לתרגל כתיבה, בניית דמות וניסוח הם חלק מרכזי מהלמידה. AI יכול לשאול את הילד שאלות שיעזרו לו לפתח את הדמות.</p>
+    <p><b>דוגמה 2, הכנה למבחן בתיכון:</b> אם התלמיד כבר למד את החומר, AI יכול לחסוך לו זמן בהכנת שאלות תרגול. הוא עדיין צריך לענות, לזהות מה אינו יודע ולחזור לחומר.</p>
+  </aside>
+</section>
+
+<!-- 4 -->
+<section class="slide" data-time="09:37–09:47" data-mins="10" data-start="7">
+  <h2>שני תלמידים, <em>אותו תוצר</em></h2>
+  <div class="cols">
+    <div class="box"><b>תלמיד א׳</b><p>נעזר ב-AI כדי להבין, לבדוק רעיונות ולשפר עבודה שכתב.</p></div>
+    <div class="box"><b>תלמיד ב׳</b><p>קיבל ממנו תשובות והגיש תוצר טוב.</p></div>
+  </div>
+  <aside class="notes">
+    <blockquote>״שניהם עשויים לקבל ציון מצוין. השאלה היא מה יקרה כשנבקש מהם להסביר את העבודה, לפתור בעיה דומה או להמשיך ממנה.״</blockquote>
+    <p>בסיס מחקרי: בסקירת OECD מ-2026 נמצא שכלי AI יכולים לשפר את איכות הביצוע במשימה גם כשלא חל שיפור מקביל בלמידה. שימוש שמכוון במפורש ללמידה (שאלות, רמזים ומשוב) עשוי לתמוך ברכישת ידע ומיומנויות.</p>
+  </aside>
+</section>
+
+<!-- 5 -->
+<section class="slide" data-time="09:47–09:55" data-mins="8" data-start="17">
+  <div class="kicker">ארבעה דברים שחשוב לשמור בדרך</div>
+  <div class="cols">
+    <div class="box"><b>ידע</b><p>כדי לזהות תשובה לא טובה, צריך לדעת משהו על הנושא.</p></div>
+    <div class="box"><b>מאמץ</b><p>להיתקע רגע, לנסות, לטעות ולתקן.</p></div>
+    <div class="box"><b>התמודדות עם קושי</b><p>לפעמים המשימה היא דווקא לעלות קומה במדרגות.</p></div>
+    <div class="box"><b>שיקול דעת</b><p>לבחור, לבדוק למה, ולהסביר את הבחירה.</p></div>
+  </div>
+  <aside class="notes">
+    <p>כשתי דקות לכל אחד, עם דוגמה אחת בלבד.</p>
+    <p><b>ידע:</b> ״כדי לזהות תשובה לא טובה, הילד צריך לדעת משהו על הנושא. מי שלא יודע מספיק, גם יתקשה לזהות מתי ה-AI טועה.״</p>
+    <p><b>מאמץ:</b> ״להיתקע רגע, לנסות, לטעות ולתקן: אלה פעולות שבונות יכולת.״</p>
+    <p><b>התמודדות:</b> ״AI הוא מעלית קוגניטיבית מצוינת. לפעמים המשימה של הילד היא דווקא לעלות קומה במדרגות.״</p>
+    <p><b>שיקול דעת:</b> ״AI יכול להציע עשר אפשרויות. הילד צריך לבחור מה מתאים, לבדוק למה, ולהיות מסוגל להסביר את הבחירה.״</p>
+    <p><b>מעבר:</b> ״אנחנו לא צריכים למדוד את הלמידה לפי כמות הזמן שהילד סבל בדרך. אנחנו כן רוצים לראות שהוא התאמן במה שהמשימה נועדה ללמד אותו.״</p>
+  </aside>
+</section>
+
+<!-- 6 -->
+<section class="slide dark" data-time="09:55–10:03" data-mins="8" data-start="25">
+  <div class="kicker">החיבור למערכת החינוך</div>
+  <h2>שיחה של <em>שלוש דקות</em> סביב העבודה</h2>
+  <ol class="list">
+    <li>״איזה רעיון במצגת הכי חשוב לך?״</li>
+    <li>״איך החלטת מה להכניס ומה להשאיר בחוץ?״</li>
+    <li>״מה היית משנה אם הקהל היה ילדים צעירים ממך?״</li>
+  </ol>
+  <aside class="notes">
+    <blockquote>״גם במערכת החינוך אנחנו מתמודדים עם אותה שאלה. כשילד מגיש תוצר מצוין, התוצר לבדו כבר לא מספר את כל הסיפור. חשוב לראות גם איך הוא הגיע אליו, אילו החלטות קיבל ומה הוא מסוגל להסביר ולעשות בעקבותיו.<br>בעבודה שלנו על שילוב AI בלמידה ובהערכה, השאלות האלה נמצאות במרכז. והבשורה להורים היא שלא צריך לבנות אירוע הערכה בבית. לפעמים שיחה של שלוש דקות סביב העבודה נותנת תמונה טובה מאוד.״</blockquote>
+    <p>דוגמה: ילד מראה להורה מצגת שהכין. במקום לבדוק רק אם המצגת יפה, שואלים את השאלות שעל המסך.</p>
+    <p><b>מעבר:</b> ״עכשיו נעבור מהשאלה ‘איך יודעים?’ לשאלה ‘מה עושים?’.״</p>
+  </aside>
+</section>
+
+<!-- 7 -->
+<section class="slide" data-time="10:03–10:09" data-mins="6" data-start="33">
+  <div class="kicker">ארגז הכלים · כלי 1</div>
+  <h2>שלוש שאלות לפני שפונים ל-AI</h2>
+  <ol class="list">
+    <li>מה הילד אמור ללמוד מהמשימה?</li>
+    <li>איזה חלק חשוב שיעשה בעצמו?</li>
+    <li>איפה AI יכול לעזור לו להתקדם?</li>
+  </ol>
+  <p class="big" style="margin-top:4vh"><span class="pill" style="font-size:.8em;background:var(--saffron);color:var(--ink)">קודם אני, אחר כך AI</span></p>
+  <aside class="notes">
+    <p>מבקשים מההורים לצלם את השקף.</p>
+    <blockquote>״ילד בכיתה ה׳ צריך לכתוב סיפור. אם המטרה היא לתרגל כתיבה, את הסיפור הוא יכתוב. אפשר להיעזר ב-AI כדי לשאול: ‘תן לי שלוש שאלות שיעזרו לי לפתח את הדמות שלי’. עכשיו הכלי נותן לו נקודת פתיחה, והילד עושה את עבודת הכתיבה.״</blockquote>
+    <p><b>קודם אני, אחר כך AI:</b> לפני פתיחת הכלי הילד כותב מה הוא כבר יודע, מה הוא חושב ומה אינו מבין. גם דקה של חשיבה עצמאית נותנת לו נקודת מוצא משלו.</p>
+  </aside>
+</section>
+
+<!-- 8 -->
+<section class="slide" data-time="10:09–10:17" data-mins="8" data-start="39">
+  <div class="kicker">כלי 2 · לבקש מ-AI ללמד</div>
+  <p class="strike">״פתור לי את התרגיל.״</p>
+  <h2>איך הייתם משנים את הבקשה?</h2>
+  <div class="cols" style="font-size:.9em">
+    <div class="box"><p>״שאל אותי שאלה אחת בכל פעם כדי לעזור לי להגיע לפתרון.״</p></div>
+    <div class="box"><p>״תן לי רמז אחד בלבד.״</p></div>
+    <div class="box"><p>״אנסה לפתור בעצמי. בדוק את הדרך שלי והראה לי איפה כדאי לבדוק שוב.״</p></div>
+    <div class="box"><p>״בחן אותי על החומר. חכה לתשובה שלי לפני שאתה ממשיך.״</p></div>
+  </div>
+  <aside class="notes">
+    <p>שואלים את הקהל: <i>איך הייתם משנים את הבקשה אם המטרה היא שהילד ילמד לפתור?</i> אוספים 2–3 הצעות, ואז מציגים את הנוסחים.</p>
+    <blockquote>״הבקשה שאנחנו כותבים לכלי קובעת במידה רבה את התפקיד שלו. הוא יכול לתת תשובה, והוא יכול גם לשאול, לתת רמז, להציע תרגול ולהגיב לניסיון של הילד.״</blockquote>
+  </aside>
+</section>
+
+<!-- 9 -->
+<section class="slide dark" data-time="10:17–10:29" data-mins="12" data-start="47">
+  <div class="kicker">כלי 3 · תרגיל ההורים</div>
+  <h2>שלוש משימות, שלושה גילאים</h2>
+  <div class="cols" style="font-size:.85em">
+    <div class="box"><b>א׳ · יסודי</b><p>כיתה ה׳, סיפור קצר עם דמות שעוברת שינוי. מבקשת: ״כתוב לי סיפור מקורי של עמוד״.</p></div>
+    <div class="box"><b>ב׳ · חטיבה</b><p>כיתה ח׳, נתקע בתרגיל במתמטיקה. מבקש את הפתרון המלא.</p></div>
+    <div class="box"><b>ג׳ · תיכון</b><p>עבודה על אנרגיה מתחדשת. AI הציע ראשי פרקים, טענות ומקורות.</p></div>
+  </div>
+  <p style="margin-top:2vh">1. מה הילד אמור ללמוד? · 2. מה יעשה בעצמו? · 3. איזו עזרה יבקש מ-AI? · 4. איך נדע מה למד?</p>
+  <div class="timer-box" id="exTimer">
+    <span class="t">05:00</span>
+    <button data-sec="300" class="on">עבודה בזוגות · 5</button>
+    <button data-sec="300">שיתוף · 5</button>
+    <button data-sec="120">סיכום · 2</button>
+    <button data-act="go">▶ התחלה</button>
+  </div>
+  <aside class="notes">
+    <p>מחלקים דף עם שלושת המקרים. כל זוג בוחר מקרה אחד ועונה על ארבע השאלות. 5 דק׳ בזוגות, 5 דק׳ שיתוף, 2 דק׳ סיכום.</p>
+    <p><b>א׳:</b> הילדה בוחרת את הדמות וכותבת. AI יכול לשאול אותה שאלות על הרצון של הדמות, הקושי שלה ומה השתנה בסוף.</p>
+    <p><b>ב׳:</b> התלמיד מסמן באיזה שלב נתקע ומבקש רמז אחד. אחר כך מנסה להמשיך ומבקש בדיקה של הדרך.</p>
+    <p><b>ג׳:</b> היא בוחרת שאלת מחקר, בודקת את המקורות עצמם, מחליטה אילו טענות מבוססות ובונה את הטיעון שלה.</p>
+    <p><b>סיכום:</b> ״אותו שימוש ב-AI יכול להיות מועיל מאוד במשימה אחת ולפספס את מטרת הלמידה במשימה אחרת. קודם מזהים מה הילד לומד, ואז מחליטים מה לבקש מהכלי.״</p>
+  </aside>
+</section>
+
+<!-- 10 -->
+<section class="slide" data-time="10:29–10:38" data-mins="9" data-start="59">
+  <div class="kicker">כלי 4 · מבחן הבעלות</div>
+  <h2>חמש שאלות אחרי שימוש ב-AI</h2>
+  <ol class="list">
+    <li>תסביר לי את זה במילים שלך.</li>
+    <li>למה בחרת דווקא בדרך הזאת?</li>
+    <li>מה יכול להיות כאן לא נכון?</li>
+    <li>מה תעשה אם נשנה מעט את השאלה?</li>
+    <li>מה למדת שלא ידעת קודם?</li>
+  </ol>
+  <aside class="notes">
+    <p><b>תרגול בזוגות:</b> אחד מציג ״עבודה״ דמיונית על הנושא מהתרגיל הקודם. השני בוחר <b>שתי שאלות בלבד</b>. אחרי דקה מתחלפים.</p>
+    <blockquote>״זו לא בחינה שההורה עושה לילד בסוף כל עבודה. אלה שאלות שעוזרות לנו להתעניין בדרך שלו. אם קשה לו לענות, גילינו יחד לאן כדאי לחזור.״</blockquote>
+  </aside>
+</section>
+
+<!-- 11 -->
+<section class="slide dark" data-time="10:38–10:46" data-mins="8" data-start="68">
+  <div class="kicker">כלי 5 · הדגמה חיה</div>
+  <h2>שיחה מלמדת עם AI</h2>
+  <div class="prompt-big">״אני תלמיד בכיתה ו׳ שלומד על מחזור המים. אני רוצה להבין את התהליך ולהתכונן לשאלה בכיתה. שאל אותי שאלה אחת בכל פעם. אם טעיתי, תן לי רמז קצר ואפשר לי לנסות שוב. אחרי שלוש שאלות, בקש ממני להסביר את כל התהליך במילים שלי.״</div>
+  <p style="margin-top:2vh;font-size:.75em"><a href="#" id="backupShot" style="color:#C9D2D8">צילום מסך גיבוי (טרם נוסף)</a></p>
+  <aside class="notes">
+    <p>מדגימים בכל כלי שיחה זמין, עם נושא כללי שאינו כולל מידע על ילד מסוים. עונים בכוונה תשובה חלקית לאחת השאלות, כדי להראות כיצד מבקשים רמז ומנסים שוב.</p>
+    <p><b>מה הקהל צריך לראות:</b> הילד נדרש לענות ולחשוב · הכלי מתאים את השאלה או נותן רמז · בסוף הילד מסביר במילים שלו.</p>
+    <p>גיבוי: לשמור צילום מסך כ-<code>demo-backup.png</code> בתיקיית האתר.</p>
+  </aside>
+</section>
+
+<!-- 12 -->
+<section class="slide" data-time="10:46–10:50" data-mins="4" data-start="76">
+  <div class="kicker">כלי 6 · התאמה לגיל</div>
+  <table>
+    <tr><th>גיל</th><th>הדגש להורה</th></tr>
+    <tr><td><b>יסודי</b></td><td>שימוש משותף, בניית יסודות, ״קודם אתה״ ועזרה בהסבר ובתרגול</td></tr>
+    <tr><td><b>חטיבה</b></td><td>יותר עצמאות, לצד בדיקה, השוואה והסבר של התשובות</td></tr>
+    <tr><td><b>תיכון</b></td><td>אחריות על דרך העבודה, בדיקת מקורות ויכולת לנמק החלטות</td></tr>
+  </table>
+  <aside class="notes">
+    <blockquote>״אין רשימת משימות שמתאימה לכל הילדים. הגיל חשוב, אבל גם הילד עצמו, מטרת המשימה והמיומנות שהוא בונה כרגע.״</blockquote>
+    <p>במשימה מבית הספר כדאי לבדוק את הנחיות המורה והכלים המאושרים. הנחיות משרד החינוך מבחינות בין שכבות גיל וסוגי כלים, וכוללות התייחסות לאישור הורים.</p>
+  </aside>
+</section>
+
+<!-- 13 -->
+<section class="slide dark" data-time="10:50–11:00" data-mins="10" data-start="80">
+  <div class="kicker">המצפן הביתי</div>
+  <div class="cols">
+    <div class="box"><b>לפני</b><p class="big">מה הילד צריך ללמוד?</p></div>
+    <div class="box"><b>תוך כדי</b><p class="big">במה AI עוזר לו, ומה הוא עושה בעצמו?</p></div>
+    <div class="box"><b>אחרי</b><p class="big">האם הוא מסוגל להסביר, לבדוק ולהמשיך?</p></div>
+  </div>
+  <aside class="notes"><p>מסכמים את שלושת השלבים לפני משימת היציאה.</p></aside>
+</section>
+
+<!-- 14 -->
+<section class="slide" data-time="10:50–11:00" data-mins="10" data-start="80">
+  <div class="kicker">משימת יציאה · דקה אחת</div>
+  <h2>משפט אחד לשבוע הקרוב</h2>
+  <ol class="list" style="font-size:1.1em">
+    <li>״מה אתה אמור ללמוד מהמשימה הזאת?״</li>
+    <li>״בוא נבקש רמז אחד וננסה להמשיך.״</li>
+    <li>״תסביר לי למה בחרת בדרך הזאת.״</li>
+  </ol>
+  <p class="closing">אני מבין את זה, <em>אני בחרתי</em>, ואני יודע גם איך להמשיך מכאן.</p>
+  <div class="qr"><div class="qrcode"></div>כל הכלים בעמוד ההורים</div>
+  <aside class="notes">
+    <p>כל הורה בוחר משפט אחד. שני הורים משתפים. אחר כך כשבע דקות לשאלות.</p>
+    <blockquote>״אני רוצה שהילדים שלנו ידעו לעשות יותר בעזרת AI. ושכשישאלו אותם על מה שעשו, הם יוכלו לומר בגאווה: אני מבין את זה, אני בחרתי, ואני יודע גם איך להמשיך מכאן.״</blockquote>
+  </aside>
+</section>
+
+<div id="notes"></div>
+<div id="progress"></div>
+<div id="hud"><span id="counter"></span><span id="clock" title="T להפעלה / עצירה">⏱ 00:00</span></div>
+<div id="help">← הבא · → הקודם · N הערות · T טיימר · F מסך מלא</div>
+<button class="navbtn" id="prev" title="הקודם">→</button>
+<button class="navbtn" id="next" title="הבא">←</button>
+
+<script>
+  const slides = [...document.querySelectorAll(".slide")];
+  const notesEl = document.getElementById("notes");
+  let i = 0;
+
+  function show(n){
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach((s, k) => s.classList.toggle("on", k === i));
+    const s = slides[i];
+    document.body.classList.toggle("dark-on", s.classList.contains("dark"));
+    counter.textContent = `שקף ${i + 1}/${slides.length}`;
+    progress.style.width = ((i + 1) / slides.length * 100) + "%";
+    notesEl.innerHTML = `<div class="when"><span dir="ltr">${s.dataset.time}</span> ·${s.dataset.mins} דק׳</div>` + (s.querySelector(".notes")?.innerHTML || "");
+    if (location.hash !== "#" + (i + 1)) history.replaceState(null, "", "#" + (i + 1));
+    tickClock();
+  }
+
+  // session timer
+  let t0 = null, elapsed = 0, running = false;
+  const fmt = sec => String(Math.floor(sec / 60)).padStart(2, "0") + ":" + String(Math.floor(sec % 60)).padStart(2, "0");
+  function nowElapsed(){ return elapsed + (running ? (Date.now() - t0) / 1000 : 0); }
+  function tickClock(){
+    const sec = nowElapsed();
+    const planned = Number(slides[i].dataset.start) * 60;
+    const diff = Math.round((sec - planned) / 60);
+    const status = !running && sec === 0 ? "" : diff > 1 ? ` · ${diff} דק׳ מאחור` : diff < -1 ? ` · ${-diff} דק׳ לפני` : " · בזמן";
+    clock.textContent = "⏱ " + fmt(sec) + status;
+    clock.classList.toggle("late", diff > 1 && sec > 0);
+  }
+  function toggleClock(){
+    if (running) { elapsed += (Date.now() - t0) / 1000; running = false; }
+    else { t0 = Date.now(); running = true; }
+    tickClock();
+  }
+  setInterval(() => running && tickClock(), 1000);
+  clock.addEventListener("click", toggleClock);
+
+  // exercise timer (slide 9)
+  const ex = document.getElementById("exTimer");
+  let exLeft = 300, exRun = null;
+  const exT = ex.querySelector(".t"), exGo = ex.querySelector("[data-act=go]");
+  ex.querySelectorAll("[data-sec]").forEach(b => b.addEventListener("click", () => {
+    ex.querySelectorAll("[data-sec]").forEach(x => x.classList.toggle("on", x === b));
+    clearInterval(exRun); exRun = null; exGo.textContent = "▶ התחלה";
+    exLeft = Number(b.dataset.sec); exT.textContent = fmt(exLeft);
+  }));
+  exGo.addEventListener("click", () => {
+    if (exRun) { clearInterval(exRun); exRun = null; exGo.textContent = "▶ המשך"; return; }
+    exGo.textContent = "⏸ עצירה";
+    exRun = setInterval(() => {
+      exLeft = Math.max(0, exLeft - 1); exT.textContent = fmt(exLeft);
+      if (!exLeft) { clearInterval(exRun); exRun = null; exGo.textContent = "▶ התחלה"; exT.textContent = "הזמן נגמר"; }
+    }, 1000);
+  });
+
+  document.getElementById("backupShot").addEventListener("click", e => {
+    e.preventDefault(); window.open("demo-backup.png", "_blank");
+  });
+
+  document.addEventListener("keydown", e => {
+    if (e.target.closest?.("button") && (e.key === " " || e.key === "Enter")) return;
+    const k = e.key;
+    if (["ArrowLeft", "PageDown", " ", "ArrowDown"].includes(k)) { e.preventDefault(); show(i + 1); }
+    else if (["ArrowRight", "PageUp", "ArrowUp", "Backspace"].includes(k)) { e.preventDefault(); show(i - 1); }
+    else if (k === "Home") show(0);
+    else if (k === "End") show(slides.length - 1);
+    else if (k === "n" || k === "N" || k === "מ") notesEl.classList.toggle("show");
+    else if (k === "t" || k === "T" || k === "א") toggleClock();
+    else if (k === "f" || k === "F" || k === "כ") document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.();
+  });
+  prev.addEventListener("click", () => show(i - 1));
+  next.addEventListener("click", () => show(i + 1));
+  window.addEventListener("hashchange", () => show(Number(location.hash.slice(1)) - 1 || 0));
+
+  // QR → parents page, resolved relative to wherever the deck is hosted
+  const parentsUrl = new URL("index.html", location.href).href;
+  if (window.QRCode) document.querySelectorAll(".qrcode").forEach(el =>
+    new QRCode(el, { text: parentsUrl, width: 220, height: 220, colorDark: "#1B2B3A", colorLight: "#ffffff" }));
+
+  show((Number(location.hash.slice(1)) || 1) - 1);
+</script>
+</body>
+</html>
